@@ -1,0 +1,613 @@
+---
+title: "Introducing the INFUZE ggplot2 theme"
+author: "Roger Beecham"
+---
+
+```{r}
+#| echo: false
+#| eval: true
+#| message: false
+#| warning: false
+library(knitr)
+library(here)
+```
+
+## Introduction
+
+This document serves as a tool for INFUZE researchers to implement the excellent INFUZE design theme within their own data graphics. The design was created by [Tara Hanrahan](https://www.designcouncil.org.uk/who-we-are/our-people/tara-hanrahan/), Visual Communications Designer on INFUZE. The newly released [2025 Indeces of Deprivation](https://www.gov.uk/government/statistics/english-indices-of-deprivation-2025) is used as source data, for no special reason.
+
+
+## Setup
+
+Listed below are packages on which this document depends.
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-fold: true
+library(here) 
+library(tidyverse) 
+library(sf)
+# For injecting html into text annotations.
+library(ggtext)
+library(patchwork)
+# For access to 2025 IMD data.
+install.packages("IMD")
+library(IMD)
+```
+
+Load in and global set the INFUZE *ggplot2* theme, and declare the INFUZE colours. 
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-fold: true
+source(here("code", "theme_infuze.R"))
+primary <- c(teal="#009b91", purple="#827daf", mint="#73dcaa",
+                     maroon="#5a2337", midnight="#141432", light="#ebedeb")
+complementary <- c(yellow="#f5b90a", orange="#ff9646", pink="#eb8cbe",
+                     red="#f55f55", deep="#3c503c")
+```
+
+
+## Data
+
+Load in boundary data, collected from [ONS Open Geography Portal](https://geoportal.statistics.gov.uk), simplified using [mapshaper](https://mapshaper.org). Collect deprivation data for Leeds and York (comparison). 
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-fold: true
+# Boundary data, simplified via rmapshaper. 
+# Source from https://geoportal.statistics.gov.uk 
+lsoa_boundaries <- st_read(here("data","lsoa_boundaries.geojson")) |> 
+  st_transform(crs=27700) |> 
+  select(lsoa_code=LSOA11CD, easting=BNG_E, northing=BNG_N) |> 
+  left_join(read_csv(here("data", "lsoa_lookup.csv")) |> 
+             select(lsoa_code=LSOA11CD, lad_name=LAD20NM) )
+
+imd_yorks <- imd_england_lsoa |> 
+  inner_join(lsoa_boundaries |> 
+               st_drop_geometry() |> 
+               select(lsoa_code, lad_name)) |> 
+  filter(lad_name %in% c("Leeds", "York")) 
+```
+
+## Bar charts
+
+Below are bar charts summarising neighbourhood counts by national deprivation quinitile, sparated by deprivation domain. 
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-fold: true
+# X-axis labels, identifying high-mid-low quintiles/
+quintile_labels <- custom_labels <- c("high",  "", "mid",  "", "low")
+# Convert decile to quintile, per deprivation domain. 
+quintile_counts <- imd_yorks |> 
+  select(city=lad_name, IMD_decile:Environment_decile) |> 
+  pivot_longer(cols=IMD_decile:Environment_decile, 
+               names_to="domain", values_to="decile") |> 
+  mutate(
+    quintile= case_when(
+      decile <= 2 ~ 1L,  
+      decile <= 4 ~ 2L,  
+      decile <= 6 ~ 3L,  
+      decile <= 8 ~ 4L,  
+      decile <= 10 ~ 5L, 
+      .default = NA_integer_ ),
+    domain=str_replace(domain, "_.*", ""),
+    domain=factor(domain, levels=c("IMD", "Income", "Employment", "Education", "Health",
+                           "Crime", "Housing", "Environment"))
+    ) |> 
+  group_by(city, quintile, domain) |> 
+  summarise(count=n()) 
+
+p <- quintile_counts |> 
+  filter(domain!="IMD", city=="Leeds") |> 
+  ggplot(aes(x=quintile, y=count)) +
+  geom_col(fill=primary["teal"]) +
+  scale_x_continuous(labels=quintile_labels, breaks=1:5) +
+  facet_wrap(~domain, nrow=1) +
+  labs(
+    title=glue("Neighbourhood counts by deprivation quintile in Leeds"),
+    subtitle="Relative deprivation in small-area neighbourhoods (LSOAs)",
+    x="deprivation quintile", y="LSOA count",
+    caption="Source: Indices of Deprivation 2025, HCLG"
+    ) 
+quartz(file = here("figs", "bars.png"), type = "png", dpi = 300, width = 9, height = 3.5)
+print(p)
+dev.off()
+```
+
+```{r}
+#| label: fig-bars
+#| out.width: 100%
+#| echo: false
+#| eval: true
+include_graphics(here("figs", "bars.png"), error = FALSE)
+```
+
+In order to explore the complementary hues, we introduce York as a comparator and show relative numbers within quintile category.
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-fold: true
+# Introduce colour legend into title by injecting html.
+plot_title <- glue("Neighbourhood counts by deprivation quintile in <span style = 'color: {primary['teal']};'>**Leeds**</span> and <span style = 'color: {complementary['orange']};'>**York**</span>")
+
+p <- quintile_counts |> 
+  group_by(city, domain) |> 
+  mutate(num_lsoas=sum(count)) |> 
+  group_by(city, quintile, domain) |> 
+  mutate(prop=sum(count)/num_lsoas) |> 
+  filter(domain!="IMD") |> 
+  ggplot(aes(x=quintile, y=prop)) +
+  geom_col(aes(fill=city), position="dodge") +
+  scale_x_continuous(labels=quintile_labels, breaks=1:5) +
+  scale_y_continuous(labels=scales::percent) +
+  scale_fill_manual(
+    values=as.vector(c(primary["teal"], complementary["orange"])),
+    guide="none") +
+  facet_grid(city~domain) +
+  labs(
+    title=plot_title,
+    subtitle="Relative deprivation in small-area neighbourhoods (LSOAs)",
+    x="deprivation quintile", y="% LSOAs in quintile",
+    caption="Source: Indices of Deprivation 2025, HCLG"
+    ) 
+
+quartz(file = here("figs", "bars_comp.png"), type = "png", dpi = 300, width = 9, height = 4.5)
+print(p)
+dev.off()
+```
+
+```{r}
+#| label: fig-bars-comp
+#| out.width: 100%
+#| echo: false
+#| eval: true
+include_graphics(here("figs", "bars_comp.png"), error = FALSE)
+```
+
+An alternative way of effecting this comparison is to superimpose the bars, using transparency (`alpha` channel) to help make discernible bars that would be otherwise occluded. For categorical (hue-based) colour schemes to be used in graphics, we want each colour to have equal saliency (saturation and brightness), which seems to be the case here. 
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-fold: true
+p <- quintile_counts |> 
+  group_by(city, domain) |> 
+  mutate(num_lsoas=sum(count)) |> 
+  group_by(city, quintile, domain) |> 
+  mutate(prop=sum(count)/num_lsoas) |> 
+  filter(domain!="IMD") |> 
+  ggplot(aes(x=quintile, y=prop, fill=city)) +
+  geom_col(data=. %>% filter(city=="York"), alpha=.5) +
+  geom_segment(aes(x=quintile-.5, xend=quintile+.5, y=prop, yend=prop, colour=city), linewidth=1) +
+  geom_col(data=. %>% filter(city=="Leeds"), alpha=.5) +
+  scale_x_continuous(labels=quintile_labels, breaks=1:5) +
+  scale_y_continuous(labels=scales::percent) +
+  scale_fill_manual(
+    values=as.vector(c(primary["teal"], complementary["orange"])),
+    guide="none") +
+  scale_colour_manual(
+    values=as.vector(c(primary["teal"], complementary["orange"])),
+    guide="none") +
+  facet_wrap(~domain, nrow=1) +
+  labs(
+    title=plot_title,
+    subtitle="Relative deprivation in small-area neighbourhoods (LSOAs)",
+    x="deprivation quintile", y="% LSOAs in quintile",
+    caption="Source: Indices of Deprivation 2025, HCLG"
+    ) 
+
+quartz(file = here("figs", "bars_comp_super.png"), type = "png", dpi = 300, width = 9, height = 3.5)
+print(p)
+dev.off()
+```
+
+```{r}
+#| label: fig-bars-comp-super
+#| out.width: 100%
+#| echo: false
+#| eval: true
+include_graphics(here("figs", "bars_comp_super.png"), error = FALSE)
+```
+
+## Bivariate plots
+
+Next, we can try varying the `alpha` channel continuously on a data value. Below are heatmaps encoding pairwise frequencies of LSOAs in each deprivation domain and the IMD (multiple deprivation) domain. We obviously expect an *association* between the IMD quintile position and that of the individual domains (more colour in the diagonals). But this will be more likely for domains that contribute greater information (higher weights), and less likely for domains that introduce context wider than demographics alone (*Environment* and *Housing*).     
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-fold: true
+plot_title <- glue("Bivariate counts by domain quintile and IMD in <span style = 'color: {primary['teal']};'>**Leeds**</span> and <span style = 'color: {complementary['orange']};'>**York**</span>")
+p <- imd_yorks |> 
+  select(lsoa_code, city=lad_name, IMD_decile:Environment_decile) |> 
+  pivot_longer(
+    cols=IMD_decile:Environment_decile,
+    names_to="domain", values_to="decile"
+    ) |> 
+  mutate(
+    quintile= case_when(
+      decile <= 2 ~ 1L,  
+      decile <= 4 ~ 2L,  
+      decile <= 6 ~ 3L,  
+      decile <= 8 ~ 4L,  
+      decile <= 10 ~ 5L, 
+      .default = NA_integer_ ),
+    domain=str_replace(domain, "_.*", "")
+  ) |> 
+  select(-decile) |> 
+  pivot_wider(names_from=domain, values_from=quintile) |> 
+  pivot_longer(cols=Income:Environment, names_to="domain", values_to="quintile") |>
+  group_by(city, domain, IMD, quintile) |> 
+  summarise(count=n()) |>  ungroup() |> 
+  group_by(city) |> 
+  mutate(
+    count_rescaled=count/max(count),
+    domain=factor(domain, levels=c("Income", "Employment", "Education", "Health",
+                           "Crime", "Housing", "Environment"))
+    ) |> 
+  ggplot(aes(x=quintile, y=IMD)) +
+  geom_tile(aes(fill=city, alpha=count_rescaled), colour="#ebedeb", size=.8) +
+  scale_alpha(guide="none") +
+  scale_fill_manual(
+    values=as.vector(c(primary["teal"], complementary["orange"])),
+    guide="none") +
+  scale_x_continuous(labels=quintile_labels, breaks=1:5) +
+  scale_y_continuous(labels=quintile_labels, breaks=1:5) +
+  facet_grid(city~domain) +
+  coord_equal() +
+  labs(
+    title=plot_title,
+    subtitle="Relative deprivation in small-area neighbourhoods (LSOAs)",
+    x="deprivation quintile", y="LSOA count",
+    caption="Source: Indices of Deprivation 2025, HCLG"
+    ) 
+
+quartz(file = here("figs", "heatmaps.png"), type = "png", dpi = 300, width = 11, height = 4)
+print(p)
+dev.off()
+```
+
+
+```{r}
+#| label: fig-heatmaps
+#| out.width: 100%
+#| echo: false
+#| eval: true
+include_graphics(here("figs", "heatmaps.png"), error = FALSE)
+```
+
+We should also try with a more familiar chart idiom: scatterplots. Here we need to switch-up quintile positions to ranks, from 1 (most deprived) to 42619 (least deprived). Extreme differences between the IMD rank of an LSOA and that of the domain (>20k rank positions) are highlighted in bold fill.
+
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-fold: true
+plot_title <- glue("Rank positions by domain and IMD in <span style = 'color: {primary['teal']};'>**Leeds**</span> and <span style = 'color: {complementary['orange']};'>**York**</span>")
+p <- imd_yorks |> 
+  select(lsoa_code, city=lad_name, IMD_rank:Environment_rank) |> 
+  pivot_longer(
+    cols=IMD_rank:Environment_rank,
+    names_to="domain", values_to="rank"
+    ) |> 
+  pivot_wider(names_from=domain, values_from=rank) |> 
+  pivot_longer(cols=Income_rank:Environment_rank, names_to="domain", values_to="rank") |>
+  mutate(
+    domain=str_replace(domain, "_.*", ""), 
+    domain=factor(domain, levels=c("Income", "Employment", "Education", "Health",
+                           "Crime", "Housing", "Environment")),
+    is_extreme=abs(IMD_rank-rank) > 20000
+  ) |> 
+  ggplot(aes(x=rank, y=IMD_rank)) +
+  geom_point(data=. %>% filter(!is_extreme), aes(colour=city), size=.8, pch=21, alpha=.4) +
+  geom_point(data=. %>% filter(is_extreme), aes(colour=city), size=1.3, pch=19) +
+  scale_colour_manual(
+    values=as.vector(c(primary["teal"], complementary["orange"])),
+    guide="none") +
+  scale_fill_manual(
+    values=as.vector(c(primary["teal"], complementary["orange"])),
+    guide="none") +
+  scale_x_continuous(breaks=c(1, 30000), labels=c("1", "30k")) +
+  scale_y_continuous(breaks=c(1, 30000), labels=c("1", "30k")) +
+  facet_grid(city~domain) +
+  coord_equal() +
+  labs(
+    title=plot_title,
+    subtitle="Relative deprivation in small-area neighbourhoods (LSOAs)",
+    x="domain rank", y="IMD rank",
+    caption="Source: Indices of Deprivation 2025, HCLG"
+    ) 
+
+quartz(file = here("figs", "scatters.png"), type = "png", dpi = 300, width = 11, height = 4)
+print(p)
+dev.off()
+```
+
+```{r}
+#| label: fig-scatters
+#| out.width: 100%
+#| echo: false
+#| eval: true
+include_graphics(here("figs", "scatters.png"), error = FALSE)
+```
+
+## Maps
+
+Below are choropleths in which each spatial unit is an LSOA in Leeds (482 in total), coloured according to deprivation quintile.
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-fold: true
+# Create sf file based on deprivation quintile, by domain
+dat <- imd_yorks |> 
+  select(lsoa_code, city=lad_name, IMD_decile:Environment_decile) |> 
+  pivot_longer(
+    cols=IMD_decile:Environment_decile,
+    names_to="domain", values_to="decile"
+    ) |> 
+  mutate(
+    quintile= case_when(
+      decile <= 2 ~ 1L,  
+      decile <= 4 ~ 2L,  
+      decile <= 6 ~ 3L,  
+      decile <= 8 ~ 4L,  
+      decile <= 10 ~ 5L, 
+      .default = NA_integer_ ),
+    domain=str_replace(domain, "_.*", "")
+  ) |> 
+  select(-decile) |> 
+  filter(city=="Leeds", domain!="IMD") |>
+  mutate(
+    domain=factor(domain, levels=c("Income", "Employment", "Education", "Health",
+                           "Crime", "Housing", "Environment"))) |>  
+  inner_join(lsoa_boundaries) |> 
+  st_as_sf()
+
+# Wrapper function for plotting deprivation
+# quintiles for individual domains, with a bar-plot legend. 
+# Also for trying different INFUZE colours.
+map_domain <- function(dat, fill_colour, line_colour) {
+  # Spatial extent of geog.
+  bbox <- st_bbox(dat)
+  map_width <- bbox$xmax-bbox$xmin
+  map_height <- bbox$ymax-bbox$ymin
+  # Draw map
+  map <- dat |> 
+  ggplot() +
+  geom_sf(aes(alpha=quintile), fill=fill_colour, colour=line_colour, linewidth=.05) +
+  annotate("text", x=bbox$xmin+.5*map_width, y=bbox$ymax+.08*map_height, label=dat |> slice(1) |> pull(domain) |> as.character(), vjust="top", size=rel(4)) +
+  coord_sf(xlim = c(unname(bbox$xmin-.05*map_width), unname(bbox$xmax))) +
+  scale_alpha_continuous(range=c(1,0.2), guide="none") +
+  theme(
+    axis.line = element_blank(), axis.text = element_blank(),
+    axis.title.x = element_blank(), axis.title.y = element_blank(),
+    plot.margin = margin(0, 0, 0, 0, "pt")
+  )
+  
+  bars <- dat |> st_drop_geometry() |>  
+    group_by(quintile) |> 
+    summarise(count=n()) |> 
+    ggplot(aes(x=quintile, y=count, alpha=quintile)) +
+    geom_col(fill=fill_colour) +
+    scale_x_continuous(expand=c(0, 0), labels=c("h", "","m","","l"), breaks=1:5) +
+    scale_y_continuous(expand=c(0, 0)) +
+    scale_alpha_continuous(range=c(1,0.2), guide="none") +
+    theme(
+    plot.margin = margin(0, 0, 0, 0, "pt"), axis.title.x=element_blank(),
+    axis.text.y = element_blank(), axis.title.y = element_blank(),
+    axis.text.x = element_text(size=rel(.8)), panel.background =element_rect(fill="transparent") 
+  )
+  return(map + inset_element(bars,0,0,.22,.4))
+}
+
+# Plot all seven domains  
+p_domains <- map(dat |> pull(domain) |> unique() |> as.character(),  
+                 ~map_domain(dat |> filter(domain==.x), primary["teal"], primary["light"])
+)
+
+comp_plot <- ((p_domains[[1]] | p_domains[[2]] | p_domains[[3]] ) /
+              (p_domains[[4]] | p_domains[[5]] | p_domains[[6]]) / 
+              (p_domains[[7]] | plot_spacer() | plot_spacer() ) ) +
+  plot_annotation(
+    title="LSOA quintile positions by deprivation domain",
+    subtitle="Relative deprivation in small-area neighbourhoods (LSOAs)",
+    caption="Source: Indices of Deprivation 2025, HCLG"
+  )
+
+quartz(file = here("figs", "choropleths.png"), type = "png", dpi = 300, width = 7, height = 7)
+print(comp_plot)
+dev.off()
+```
+
+
+```{r}
+#| label: fig-choropleths
+#| out.width: 80%
+#| echo: false
+#| eval: true
+include_graphics(here("figs", "choropleths.png"), error = FALSE)
+```
+
+A familiar problem with encoding demographic characteristics onto choropleths is the non-regularity in spatial units. This is especially true of Leeds, since it encompasses urban and rural areas of very different population density. Dot-density maps are one solution. Below is a dot-density map of car availability.  
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-fold: true
+lsoa_vehicles <- read_csv(here("data", "lsoa_vehicles.csv")) |> 
+  inner_join(lsoa_boundaries |>
+  st_drop_geometry() |> 
+  filter(lad_name=="Leeds") |> 
+  select(lsoa_code)) |> 
+  filter(car_availability!="Does not apply") |> 
+  mutate(
+    car_availability=
+      if_else(car_availability=="No cars or vans in household", 
+              "no_car", "car")) |> 
+  group_by(lsoa_code, car_availability) |> 
+  summarise(count=sum(count)) |> 
+  ungroup() |> 
+  mutate(count_dot=round(count/10, 0)) |> 
+  filter(!is.na(count_dot))
+
+
+# Sample within LSOA polygons. 
+# This might take a bit of time to execute.
+start_time <- Sys.time()
+sampled_points <- lsoa_boundaries |>  
+  filter(lad_name=="Leeds") |> select(lsoa_code) |>  
+  inner_join(
+    lsoa_vehicles |> group_by(lsoa_code) |>  
+    summarise(count_dot=sum(count_dot)) |>  ungroup()
+    ) |> 
+  nest(data=everything()) |> 
+  mutate(
+    sampled_points=map(data, 
+      ~sf::st_sample(
+        x=.x, size=.x$count_dot, exact=TRUE, type="random"
+        ) |> st_coordinates() |> 
+        as_tibble(.name_repair=~c("east", "north"))),
+     lsoa_code=map(data, ~.x |>  st_drop_geometry() |> 
+     select(lsoa_code, count_dot) |> uncount(count_dot))
+    ) |> 
+  unnest(-data) |> 
+  select(-data)
+end_time <- Sys.time()
+end_time - start_time
+point_vehicles <- lsoa_vehicles |> select(car_availability, count_dot) |> 
+  uncount(count_dot)
+sampled_points  <- sampled_points |>  bind_cols(point_vehicles)
+
+veh_colours <- as.vector(c(primary["teal"], complementary["orange"]))
+# Plot sampled points.
+plot_title <- glue("Individuals with <span style = 'color: {primary['teal']};'>**car**</span> and <span style = 'color: {complementary['orange']};'>**nocar**</span> access")
+p <- sampled_points |> 
+  ggplot() +
+  geom_sf(
+    data=lsoa_boundaries |>  filter(lad_name=="Leeds"), fill="transparent", 
+    colour="#636363", linewidth=.05
+    ) +
+  geom_sf(data=lsoa_boundaries |>  
+  filter(lad_name=="Leeds") |> 
+      inner_join(lsoa_vehicles) |> 
+      group_by(lad_name) |>  summarise(),
+    fill="transparent", colour="#636363", linewidth=.15) +
+  geom_point(
+    aes(x=east,y=north, fill=car_availability, colour=car_availability), 
+    alpha=.4, size=.8, stroke=0
+    )+
+  scale_fill_manual(values=veh_colours, "1 dot = 10 people") +
+  scale_colour_manual(values=veh_colours, "1 dot = 10 people") +
+  guides(colour=guide_legend(override.aes=list(size=3))) +
+  theme(
+    axis.line = element_blank(), axis.text = element_blank(),
+    axis.title.x = element_blank(), axis.title.y = element_blank(),
+    plot.margin = margin(0, 0, 0, 0, "pt")
+  ) +
+  plot_annotation(
+    title=plot_title,
+    subtitle="Each dot ~ 10 people random spatially sampled within LSOA",
+    caption="Source: 2021 Census"
+  )
+
+quartz(file = here("figs", "dot_density.png"), type = "png", dpi = 300, width = 6, height = 6)
+print(p)
+dev.off() 
+```
+
+```{r}
+#| label: fig-dot-density
+#| out.width: 70%
+#| echo: false
+#| eval: true
+include_graphics(here("figs", "dot_density.png"), error = FALSE)
+```
+
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-fold: true
+
+# Spatial
+library(sp)
+library(spdep)
+library(nominatimlite)
+# OSM
+library(osmdata)
+
+# Search area around University of Leeds (long-lat).
+bbox <- c(-1.5692, 53.8014, -1.5451, 53.8157)
+bbox_sf <- bbox_to_poly(bbox)
+
+# Get buildings within bbox.
+leeds_buildings <- bbox_sf |>
+  opq() |>
+  add_osm_feature(key = "building") |>
+  osmdata_sf() 
+
+# Extract osm_polyogns.
+leeds_buildings <- leeds_buildings$osm_polygon |> st_transform(crs=27700)
+
+# Search area around University of Leeds (long-lat).
+# And bbox around osm_polygons.
+buildings_box <- st_bbox(leeds_buildings)
+buildings_width <- buildings_box$xmax-buildings_box$xmin
+buildings_height <- buildings_box$ymax-buildings_box$ymin
+
+# Create a circular buffer around centroid of buildings.
+x <- buildings_box$xmin + .5*buildings_width
+y <- buildings_box$ymin + .5*buildings_height
+
+# Create an overlay to effect a curcular crop.
+t <- st_buffer(st_as_sf(tibble(x,y), coords=c(1,2), crs=27700), dist=buildings_width*.51, endCapStyle="SQUARE")
+u <- st_buffer(st_as_sf(tibble(x,y), coords=c(1,2), crs=27700), dist=buildings_width*.42)
+v <- st_sym_difference(u,t)
+
+# Sample 1:4 for each row of the buildings dataset.
+randoms <- map_dbl(1:nrow(leeds_buildings), ~sample(1:4,1))
+colours <- as.vector(c(primary["teal"], primary["maroon"], complementary["orange"], complementary["red"]))
+p <- leeds_buildings |>
+  # Add in the sampled colour positions. Factor variable, for use in manual scale.
+  mutate(colour=factor(randoms)) |>
+  ggplot() +
+  # Draw buildings.
+  geom_sf(aes(fill=colour, colour=colour)) +
+  # Draw mask.
+  geom_sf(data=v, fill=primary["light"], colour=primary["light"]) +
+  # Du Bois palette.
+  scale_colour_manual(values=colours, guide="none") +
+  scale_fill_manual(values=colours, guide="none") +
+theme(
+    axis.line = element_blank(), axis.text = element_blank(),
+    axis.title.x = element_blank(), axis.title.y = element_blank(),
+    plot.margin = margin(0, 0, 0, 0, "pt")
+  ) +
+  plot_annotation(
+    title="Buildings around University of Leeds",
+    subtitle="Exploring a wider set of INFUZE hues",
+    caption="Source: OSM via osmdata"
+  )
+
+quartz(file = here("figs", "buildings.png"), type = "png", dpi = 300, width = 5.5, height = 5.5)
+print(p)
+dev.off() 
+```
+
+Only two of the INFUZE colour hues have been used in this quick example. The plan is to build up the use cases and bring in a wider set of encoding options -- for example trying diverging colour schemes. To quickly explore some additional INFUZE colours, below are OSM-derived building outlines surrounding University of Leeds, with a random colour assignment. 
+
+```{r}
+#| label: fig-buildings
+#| out.width: 70%
+#| echo: false
+#| eval: true
+include_graphics(here("figs", "buildings.png"), error = FALSE)
+```
