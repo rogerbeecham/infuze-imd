@@ -112,10 +112,10 @@ p <- quintile_counts |>
   labs(
     title=glue("Neighbourhood counts by deprivation quintile in Leeds"),
     subtitle="Relative deprivation in small-area neighbourhoods (LSOAs)",
-    x="deprivation quintile", y="LSOA count",
+    x="Deprivation quintile", y="LSOA count",
     caption="Source: Indices of Deprivation 2025, HCLG"
     ) 
-quartz(file = here("figs", "bars.png"), type = "png", dpi = 300, width = 9, height = 3.5)
+quartz(file = here("figs", "bars.png"), type = "png", dpi = 300, width = 9, height = 4)
 print(p)
 dev.off()
 ```
@@ -135,7 +135,7 @@ In order to explore the complementary hues, we introduce York as a comparator an
 #| eval: false
 #| code-fold: true
 # Introduce colour legend into title by injecting html.
-plot_title <- glue("Neighbourhood counts by deprivation quintile in <span style = 'color: {primary['teal']};'>**Leeds**</span> and <span style = 'color: {complementary['orange']};'>**York**</span>")
+plot_title <- glue("Neighbourhood counts by deprivation quintile in <span style = 'color: {primary['teal']};'>Leeds</span> and <span style = 'color: {complementary['orange']};'>York</span>")
 
 p <- quintile_counts |> 
   group_by(city, domain) |> 
@@ -154,11 +154,11 @@ p <- quintile_counts |>
   labs(
     title=plot_title,
     subtitle="Relative deprivation in small-area neighbourhoods (LSOAs)",
-    x="deprivation quintile", y="% LSOAs in quintile",
+    x="Deprivation quintile", y="% LSOAs in quintile",
     caption="Source: Indices of Deprivation 2025, HCLG"
     ) 
 
-quartz(file = here("figs", "bars_comp.png"), type = "png", dpi = 300, width = 9, height = 4.5)
+quartz(file = here("figs", "bars_comp.png"), type = "png", dpi = 300, width = 9, height = 5)
 print(p)
 dev.off()
 ```
@@ -199,11 +199,11 @@ p <- quintile_counts |>
   labs(
     title=plot_title,
     subtitle="Relative deprivation in small-area neighbourhoods (LSOAs)",
-    x="deprivation quintile", y="% LSOAs in quintile",
+    x="Deprivation quintile", y="% LSOAs in quintile",
     caption="Source: Indices of Deprivation 2025, HCLG"
     ) 
 
-quartz(file = here("figs", "bars_comp_super.png"), type = "png", dpi = 300, width = 9, height = 3.5)
+quartz(file = here("figs", "bars_comp_super.png"), type = "png", dpi = 300, width = 9, height = 4.5)
 print(p)
 dev.off()
 ```
@@ -224,7 +224,7 @@ Next, we can try varying the `alpha` channel continuously on a data value. Below
 #| echo: true
 #| eval: false
 #| code-fold: true
-plot_title <- glue("Bivariate counts by domain quintile and IMD in <span style = 'color: {primary['teal']};'>**Leeds**</span> and <span style = 'color: {complementary['orange']};'>**York**</span>")
+plot_title <- glue("Bivariate counts by domain quintile and IMD in <span style = 'color: {primary['teal']};'>Leeds</span> and <span style = 'color: {complementary['orange']};'>York</span>")
 p <- imd_yorks |> 
   select(lsoa_code, city=lad_name, IMD_decile:Environment_decile) |> 
   pivot_longer(
@@ -265,11 +265,11 @@ p <- imd_yorks |>
   labs(
     title=plot_title,
     subtitle="Relative deprivation in small-area neighbourhoods (LSOAs)",
-    x="deprivation quintile", y="LSOA count",
+    x="Deprivation quintile", y="LSOA count",
     caption="Source: Indices of Deprivation 2025, HCLG"
     ) 
 
-quartz(file = here("figs", "heatmaps.png"), type = "png", dpi = 300, width = 11, height = 4)
+quartz(file = here("figs", "heatmaps.png"), type = "png", dpi = 300, width = 13, height = 5)
 print(p)
 dev.off()
 ```
@@ -321,11 +321,11 @@ p <- imd_yorks |>
   labs(
     title=plot_title,
     subtitle="Relative deprivation in small-area neighbourhoods (LSOAs)",
-    x="domain rank", y="IMD rank",
+    x="Domain rank", y="IMD rank",
     caption="Source: Indices of Deprivation 2025, HCLG"
     ) 
 
-quartz(file = here("figs", "scatters.png"), type = "png", dpi = 300, width = 11, height = 4)
+quartz(file = here("figs", "scatters.png"), type = "png", dpi = 300, width = 12.5, height = 5)
 print(p)
 dev.off()
 ```
@@ -488,7 +488,7 @@ sampled_points  <- sampled_points |>  bind_cols(point_vehicles)
 
 veh_colours <- as.vector(c(primary["teal"], complementary["orange"]))
 # Plot sampled points.
-plot_title <- glue("Individuals with <span style = 'color: {primary['teal']};'>**car**</span> and <span style = 'color: {complementary['orange']};'>**nocar**</span> access")
+plot_title <- glue("Individuals with <span style = 'color: {primary['teal']};'>car</span> and <span style = 'color: {complementary['orange']};'>nocar</span> access")
 p <- sampled_points |> 
   ggplot() +
   geom_sf(
@@ -514,11 +514,11 @@ p <- sampled_points |>
   ) +
   plot_annotation(
     title=plot_title,
-    subtitle="Each dot ~ 10 people random spatially sampled within LSOA",
+    subtitle="Each dot ~ 10 people randomly allocated within LSOA",
     caption="Source: 2021 Census"
-  )
+  ) 
 
-quartz(file = here("figs", "dot_density.png"), type = "png", dpi = 300, width = 6, height = 6)
+quartz(file = here("figs", "dot_density.png"), type = "png", dpi = 300, width = 7, height = 7)
 print(p)
 dev.off() 
 ```
@@ -589,7 +589,9 @@ p <- leeds_buildings |>
 theme(
     axis.line = element_blank(), axis.text = element_blank(),
     axis.title.x = element_blank(), axis.title.y = element_blank(),
-    plot.margin = margin(0, 0, 0, 0, "pt")
+    plot.margin = margin(0, 0, 0, 0, "pt"),
+    plot.subtitle = element_markdown(margin=margin(b=0)),
+      plot.caption = element_markdown(margin=margin(t=0))
   ) +
   plot_annotation(
     title="Buildings around University of Leeds",
@@ -597,7 +599,7 @@ theme(
     caption="Source: OSM via osmdata"
   )
 
-quartz(file = here("figs", "buildings.png"), type = "png", dpi = 300, width = 5.5, height = 5.5)
+quartz(file = here("figs", "buildings.png"), type = "png", dpi = 300, width = 6.5, height = 7)
 print(p)
 dev.off() 
 ```

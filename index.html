@@ -197,10 +197,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
 <span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">title=</span><span class="fu">glue</span>(<span class="st">"Neighbourhood counts by deprivation quintile in Leeds"</span>),</span>
 <span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle=</span><span class="st">"Relative deprivation in small-area neighbourhoods (LSOAs)"</span>,</span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">x=</span><span class="st">"deprivation quintile"</span>, <span class="at">y=</span><span class="st">"LSOA count"</span>,</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">x=</span><span class="st">"Deprivation quintile"</span>, <span class="at">y=</span><span class="st">"LSOA count"</span>,</span>
 <span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption=</span><span class="st">"Source: Indices of Deprivation 2025, HCLG"</span></span>
 <span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>    ) </span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="fu">quartz</span>(<span class="at">file =</span> <span class="fu">here</span>(<span class="st">"figs"</span>, <span class="st">"bars.png"</span>), <span class="at">type =</span> <span class="st">"png"</span>, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">9</span>, <span class="at">height =</span> <span class="fl">3.5</span>)</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="fu">quartz</span>(<span class="at">file =</span> <span class="fu">here</span>(<span class="st">"figs"</span>, <span class="st">"bars.png"</span>), <span class="at">type =</span> <span class="st">"png"</span>, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">9</span>, <span class="at">height =</span> <span class="dv">4</span>)</span>
 <span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(p)</span>
 <span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="fu">dev.off</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -224,7 +224,7 @@ Figure&nbsp;1
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Introduce colour legend into title by injecting html.</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>plot_title <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">"Neighbourhood counts by deprivation quintile in &lt;span style = 'color: {primary['teal']};'&gt;**Leeds**&lt;/span&gt; and &lt;span style = 'color: {complementary['orange']};'&gt;**York**&lt;/span&gt;"</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>plot_title <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">"Neighbourhood counts by deprivation quintile in &lt;span style = 'color: {primary['teal']};'&gt;Leeds&lt;/span&gt; and &lt;span style = 'color: {complementary['orange']};'&gt;York&lt;/span&gt;"</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> quintile_counts <span class="sc">|&gt;</span> </span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(city, domain) <span class="sc">|&gt;</span> </span>
@@ -243,11 +243,11 @@ Figure&nbsp;1
 <span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
 <span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">title=</span>plot_title,</span>
 <span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle=</span><span class="st">"Relative deprivation in small-area neighbourhoods (LSOAs)"</span>,</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">x=</span><span class="st">"deprivation quintile"</span>, <span class="at">y=</span><span class="st">"% LSOAs in quintile"</span>,</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">x=</span><span class="st">"Deprivation quintile"</span>, <span class="at">y=</span><span class="st">"% LSOAs in quintile"</span>,</span>
 <span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption=</span><span class="st">"Source: Indices of Deprivation 2025, HCLG"</span></span>
 <span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    ) </span>
 <span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="fu">quartz</span>(<span class="at">file =</span> <span class="fu">here</span>(<span class="st">"figs"</span>, <span class="st">"bars_comp.png"</span>), <span class="at">type =</span> <span class="st">"png"</span>, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">9</span>, <span class="at">height =</span> <span class="fl">4.5</span>)</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="fu">quartz</span>(<span class="at">file =</span> <span class="fu">here</span>(<span class="st">"figs"</span>, <span class="st">"bars_comp.png"</span>), <span class="at">type =</span> <span class="st">"png"</span>, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">9</span>, <span class="at">height =</span> <span class="dv">5</span>)</span>
 <span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(p)</span>
 <span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="fu">dev.off</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -292,11 +292,11 @@ Figure&nbsp;2
 <span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
 <span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">title=</span>plot_title,</span>
 <span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle=</span><span class="st">"Relative deprivation in small-area neighbourhoods (LSOAs)"</span>,</span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">x=</span><span class="st">"deprivation quintile"</span>, <span class="at">y=</span><span class="st">"% LSOAs in quintile"</span>,</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">x=</span><span class="st">"Deprivation quintile"</span>, <span class="at">y=</span><span class="st">"% LSOAs in quintile"</span>,</span>
 <span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption=</span><span class="st">"Source: Indices of Deprivation 2025, HCLG"</span></span>
 <span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    ) </span>
 <span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="fu">quartz</span>(<span class="at">file =</span> <span class="fu">here</span>(<span class="st">"figs"</span>, <span class="st">"bars_comp_super.png"</span>), <span class="at">type =</span> <span class="st">"png"</span>, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">9</span>, <span class="at">height =</span> <span class="fl">3.5</span>)</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="fu">quartz</span>(<span class="at">file =</span> <span class="fu">here</span>(<span class="st">"figs"</span>, <span class="st">"bars_comp_super.png"</span>), <span class="at">type =</span> <span class="st">"png"</span>, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">9</span>, <span class="at">height =</span> <span class="fl">4.5</span>)</span>
 <span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(p)</span>
 <span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="fu">dev.off</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -322,7 +322,7 @@ Figure&nbsp;3
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>plot_title <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">"Bivariate counts by domain quintile and IMD in &lt;span style = 'color: {primary['teal']};'&gt;**Leeds**&lt;/span&gt; and &lt;span style = 'color: {complementary['orange']};'&gt;**York**&lt;/span&gt;"</span>)</span>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>plot_title <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">"Bivariate counts by domain quintile and IMD in &lt;span style = 'color: {primary['teal']};'&gt;Leeds&lt;/span&gt; and &lt;span style = 'color: {complementary['orange']};'&gt;York&lt;/span&gt;"</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> imd_yorks <span class="sc">|&gt;</span> </span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(lsoa_code, <span class="at">city=</span>lad_name, IMD_decile<span class="sc">:</span>Environment_decile) <span class="sc">|&gt;</span> </span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
@@ -363,11 +363,11 @@ Figure&nbsp;3
 <span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
 <span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">title=</span>plot_title,</span>
 <span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle=</span><span class="st">"Relative deprivation in small-area neighbourhoods (LSOAs)"</span>,</span>
-<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">x=</span><span class="st">"deprivation quintile"</span>, <span class="at">y=</span><span class="st">"LSOA count"</span>,</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">x=</span><span class="st">"Deprivation quintile"</span>, <span class="at">y=</span><span class="st">"LSOA count"</span>,</span>
 <span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption=</span><span class="st">"Source: Indices of Deprivation 2025, HCLG"</span></span>
 <span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>    ) </span>
 <span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a><span class="fu">quartz</span>(<span class="at">file =</span> <span class="fu">here</span>(<span class="st">"figs"</span>, <span class="st">"heatmaps.png"</span>), <span class="at">type =</span> <span class="st">"png"</span>, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">11</span>, <span class="at">height =</span> <span class="dv">4</span>)</span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a><span class="fu">quartz</span>(<span class="at">file =</span> <span class="fu">here</span>(<span class="st">"figs"</span>, <span class="st">"heatmaps.png"</span>), <span class="at">type =</span> <span class="st">"png"</span>, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">13</span>, <span class="at">height =</span> <span class="dv">5</span>)</span>
 <span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(p)</span>
 <span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a><span class="fu">dev.off</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -421,11 +421,11 @@ Figure&nbsp;4
 <span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
 <span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">title=</span>plot_title,</span>
 <span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle=</span><span class="st">"Relative deprivation in small-area neighbourhoods (LSOAs)"</span>,</span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">x=</span><span class="st">"domain rank"</span>, <span class="at">y=</span><span class="st">"IMD rank"</span>,</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">x=</span><span class="st">"Domain rank"</span>, <span class="at">y=</span><span class="st">"IMD rank"</span>,</span>
 <span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption=</span><span class="st">"Source: Indices of Deprivation 2025, HCLG"</span></span>
 <span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>    ) </span>
 <span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="fu">quartz</span>(<span class="at">file =</span> <span class="fu">here</span>(<span class="st">"figs"</span>, <span class="st">"scatters.png"</span>), <span class="at">type =</span> <span class="st">"png"</span>, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">11</span>, <span class="at">height =</span> <span class="dv">4</span>)</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="fu">quartz</span>(<span class="at">file =</span> <span class="fu">here</span>(<span class="st">"figs"</span>, <span class="st">"scatters.png"</span>), <span class="at">type =</span> <span class="st">"png"</span>, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="fl">12.5</span>, <span class="at">height =</span> <span class="dv">5</span>)</span>
 <span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(p)</span>
 <span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a><span class="fu">dev.off</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -596,7 +596,7 @@ Figure&nbsp;6
 <span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>veh_colours <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(<span class="fu">c</span>(primary[<span class="st">"teal"</span>], complementary[<span class="st">"orange"</span>]))</span>
 <span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot sampled points.</span></span>
-<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>plot_title <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">"Individuals with &lt;span style = 'color: {primary['teal']};'&gt;**car**&lt;/span&gt; and &lt;span style = 'color: {complementary['orange']};'&gt;**nocar**&lt;/span&gt; access"</span>)</span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>plot_title <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">"Individuals with &lt;span style = 'color: {primary['teal']};'&gt;car&lt;/span&gt; and &lt;span style = 'color: {complementary['orange']};'&gt;nocar&lt;/span&gt; access"</span>)</span>
 <span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> sampled_points <span class="sc">|&gt;</span> </span>
 <span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
 <span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(</span>
@@ -622,11 +622,11 @@ Figure&nbsp;6
 <span id="cb10-70"><a href="#cb10-70" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
 <span id="cb10-71"><a href="#cb10-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_annotation</span>(</span>
 <span id="cb10-72"><a href="#cb10-72" aria-hidden="true" tabindex="-1"></a>    <span class="at">title=</span>plot_title,</span>
-<span id="cb10-73"><a href="#cb10-73" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle=</span><span class="st">"Each dot ~ 10 people random spatially sampled within LSOA"</span>,</span>
+<span id="cb10-73"><a href="#cb10-73" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle=</span><span class="st">"Each dot ~ 10 people randomly&lt;br&gt; allocated within LSOA"</span>,</span>
 <span id="cb10-74"><a href="#cb10-74" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption=</span><span class="st">"Source: 2021 Census"</span></span>
-<span id="cb10-75"><a href="#cb10-75" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-75"><a href="#cb10-75" aria-hidden="true" tabindex="-1"></a>  ) </span>
 <span id="cb10-76"><a href="#cb10-76" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-77"><a href="#cb10-77" aria-hidden="true" tabindex="-1"></a><span class="fu">quartz</span>(<span class="at">file =</span> <span class="fu">here</span>(<span class="st">"figs"</span>, <span class="st">"dot_density.png"</span>), <span class="at">type =</span> <span class="st">"png"</span>, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">6</span>, <span class="at">height =</span> <span class="dv">6</span>)</span>
+<span id="cb10-77"><a href="#cb10-77" aria-hidden="true" tabindex="-1"></a><span class="fu">quartz</span>(<span class="at">file =</span> <span class="fu">here</span>(<span class="st">"figs"</span>, <span class="st">"dot_density.png"</span>), <span class="at">type =</span> <span class="st">"png"</span>, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">6</span>)</span>
 <span id="cb10-78"><a href="#cb10-78" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(p)</span>
 <span id="cb10-79"><a href="#cb10-79" aria-hidden="true" tabindex="-1"></a><span class="fu">dev.off</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -700,20 +700,22 @@ Figure&nbsp;7
 <span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a><span class="fu">theme</span>(</span>
 <span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.line =</span> <span class="fu">element_blank</span>(), <span class="at">axis.text =</span> <span class="fu">element_blank</span>(),</span>
 <span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_blank</span>(), <span class="at">axis.title.y =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="st">"pt"</span>)</span>
-<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_annotation</span>(</span>
-<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a>    <span class="at">title=</span><span class="st">"Buildings around University of Leeds"</span>,</span>
-<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle=</span><span class="st">"Exploring a wider set of INFUZE hues"</span>,</span>
-<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption=</span><span class="st">"Source: OSM via osmdata"</span></span>
-<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a><span class="fu">quartz</span>(<span class="at">file =</span> <span class="fu">here</span>(<span class="st">"figs"</span>, <span class="st">"buildings.png"</span>), <span class="at">type =</span> <span class="st">"png"</span>, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="fl">5.5</span>, <span class="at">height =</span> <span class="fl">5.5</span>)</span>
-<span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(p)</span>
-<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a><span class="fu">dev.off</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="st">"pt"</span>),</span>
+<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_markdown</span>(<span class="at">margin=</span><span class="fu">margin</span>(<span class="at">b=</span><span class="dv">0</span>)),</span>
+<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a>      <span class="at">plot.caption =</span> <span class="fu">element_markdown</span>(<span class="at">margin=</span><span class="fu">margin</span>(<span class="at">t=</span><span class="dv">0</span>))</span>
+<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_annotation</span>(</span>
+<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">title=</span><span class="st">"Buildings around University of Leeds"</span>,</span>
+<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle=</span><span class="st">"Exploring a wider set of INFUZE hues"</span>,</span>
+<span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption=</span><span class="st">"Source: OSM via osmdata"</span></span>
+<span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a><span class="fu">quartz</span>(<span class="at">file =</span> <span class="fu">here</span>(<span class="st">"figs"</span>, <span class="st">"buildings.png"</span>), <span class="at">type =</span> <span class="st">"png"</span>, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="fl">5.3</span>, <span class="at">height =</span> <span class="dv">6</span>)</span>
+<span id="cb11-64"><a href="#cb11-64" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(p)</span>
+<span id="cb11-65"><a href="#cb11-65" aria-hidden="true" tabindex="-1"></a><span class="fu">dev.off</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>Only two of the INFUZE colour hues have been used in this quick example. The plan is to build up the use cases and bring in a wider set of encoding options – for example trying diverging colour schemes. To quickly explore some additional INFUZE colours below are OSM-derived building outlines surrounding University of Leeds, with a random colour assignment.</p>
+<p>Only two of the INFUZE colour hues have been used in this quick example. The plan is to build up the use cases and bring in a wider set of encoding options – for example trying diverging colour schemes. To quickly explore some additional INFUZE colours, below are OSM-derived building outlines surrounding University of Leeds, with a random colour assignment.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-buildings" class="quarto-float quarto-figure quarto-figure-center anchored" width="70%">
