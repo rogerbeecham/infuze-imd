@@ -11,9 +11,10 @@ update_geom_defaults("richtext", list(family = "Arial"))
 theme_infuze_light <- function(base_size = 12) {
   return <- theme_classic(base_size, base_family="Arial") +
     theme(
+      plot.margin = margin(t=30, r=15, b=30, l=15),
       plot.title = element_markdown(size = 16, colour="#141432", face="bold"),
-      plot.subtitle = element_markdown(size = 16, colour="#5a2337", margin=margin(b=40)),
-          plot.caption = element_markdown(size = 12, colour="#5a2337", margin=margin(t=35)),
+      plot.subtitle = element_markdown(size = 16, colour="#5a2337", margin=margin(b=50)),
+          plot.caption = element_markdown(size = 10, colour="#5a2337", margin=margin(t=45)),
           plot.tag = element_markdown(size = 12, colour="#3c503c"),
           strip.text = element_markdown(size = 12, colour="#3c503c"),
           #strip.text.x = element_markdown(size = 14, margin = margin(t = 1, b = 1), colour="#3c503c"),
